@@ -10,6 +10,7 @@ High-Precision 3D Pose Estimation-based AI Dance Choreography Analysis and Evalu
 DanceMotionAI is a state-of-the-art system for analyzing and evaluating dance choreographies using advanced AI techniques. The system leverages multiple cutting-edge technologies:
 
 - 3D pose estimation with adaptive graph transformer networks
+- Precise hand movement tracking with 4DHands technology
 - Cross-modal analysis of dance and music
 - Dynamic Time Warping (DTW) for choreography similarity analysis
 - Plagiarism detection in dance choreographies
@@ -19,12 +20,13 @@ This system can be used for dance education, choreography creation, copyright pr
 ## Features
 
 - **High-precision 3D pose estimation**: Accurately track dancers' movements in 3D space
+- **4DHands hand tracking**: Detailed tracking and analysis of hand movements for expressive gestures
 - **Detailed motion analysis**: Analyze velocity, acceleration, and jerk of dance movements
 - **Beat alignment**: Evaluate synchronization between dance movements and music beats
 - **Dance quality metrics**: Comprehensive evaluation of dance performances
 - **Choreography similarity**: Compare dance sequences to detect similarities and differences
 - **Plagiarism detection**: Identify potential copyright infringement in choreographies
-- **Visualization tools**: Advanced 3D visualization of poses and dance metrics
+- **Visualization tools**: Advanced 3D visualization of poses, hand movements, and dance metrics
 
 ## Installation
 
@@ -42,8 +44,13 @@ pip install -e .
 - numpy
 - matplotlib
 - scipy
+- torch
+- torchvision
+- opencv-python
 - fastdtw
 - plotly (for interactive visualizations)
+- PyWavelets
+- scikit-learn
 
 ## Usage
 
@@ -65,23 +72,114 @@ metrics = compute_dance_metrics(reference_sequence, comparison_sequence)
 print(metrics)
 ```
 
-### Demo Script
+### 4DHands Module Example
 
-Run the included demo script to see the system's capabilities:
+```python
+import numpy as np
+import torch
+from models.hands_4d import Hands4D
+from utils.visualization import visualize_hand_keypoints
+import yaml
+import matplotlib.pyplot as plt
 
-```bash
-python examples/demo.py
+# Load configuration
+with open('configs/default_config.yaml', 'r') as f:
+    config = yaml.safe_load(f)
+
+# Initialize 4DHands model
+hands_4d_config = config['hands_4d']
+model = Hands4D(hands_4d_config)
+
+# Sample hand data: [batch_size, sequence_length, num_hands, num_keypoints, 3]
+hand_data = torch.randn(1, 30, 2, 21, 3)  
+
+# Process through model
+hand_features, gesture_logits = model(hand_data)
+
+# Visualize the first frame of hand keypoints
+sample_hand = hand_data[0, 0, 0].numpy()  # First batch, first frame, left hand
+
+# Define hand connections for visualization
+hand_connections = [
+    # Thumb connections
+    (0, 1), (1, 2), (2, 3), (3, 4),
+    # Index finger connections
+    (0, 5), (5, 6), (6, 7), (7, 8),
+    # Middle finger connections
+    (0, 9), (9, 10), (10, 11), (11, 12),
+    # Ring finger connections
+    (0, 13), (13, 14), (14, 15), (15, 16),
+    # Pinky connections
+    (0, 17), (17, 18), (18, 19), (19, 20),
+    # Palm connections
+    (1, 5), (5, 9), (9, 13), (13, 17)
+]
+
+# Visualize 
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111, projection='3d')
+visualize_hand_keypoints(sample_hand, hand_connections, ax=ax, title="Hand Pose")
+plt.show()
 ```
 
-This will generate synthetic dance sequences, analyze them, and produce visualizations demonstrating the system's features.
+### Demo Script
+
+Run the included demo scripts to see the system's capabilities:
+
+```bash
+# General demo
+python examples/demo.py
+
+# 4DHands module demo
+python examples/hands_4d_demo.py
+```
+
+These will generate synthetic dance and hand movement sequences, analyze them, and produce visualizations demonstrating the system's features.
+
+## Core Components
+
+### DanceHRNet
+
+The core 3D pose estimation engine, featuring:
+- Adaptive Graph Transformer (AGT) blocks for capturing global and local dependencies
+- Global-Local Adaptive Graph Convolutional Network (GLA-GCN) for handling occlusions
+- Keypoint Information-based Temporal Rotation Optimization (KITRO) for improved depth accuracy
+
+### 4DHands Module
+
+A specialized module for precise hand tracking and gesture analysis, consisting of:
+- **RAT (Relation-aware Two-Hand Tokenization)**: Models complex relationships between fingers and joints
+- **SIR (Spatio-temporal Interaction Reasoning)**: Analyzes interactions between hands and their temporal dynamics
+- Support for gesture recognition and hand choreography analysis
+- Optimized for dance performances with expressive hand movements
+
+### DanceFormer
+
+Cross-modal analysis system that correlates music and dance, including:
+- Cross-modal attention mechanism for music-dance alignment
+- Multi-scale transformer for hierarchical choreography analysis
+- Dynamic graph generation for modeling dancer interactions
+
+### 3D-DanceDTW
+
+Advanced similarity analysis system:
+- Multi-scale Dynamic Time Warping for temporal alignment
+- Wavelet-based decomposition for different time scales
+- Adaptive weighting system for dance style-specific comparisons
 
 ## Module Structure
 
+- `models/` - Core model implementations
+  - `dancehrnet.py` - 3D pose estimation model
+  - `hands_4d.py` - Hand tracking and analysis module
+  - `danceformer.py` - Music-dance correlation model
 - `utils/` - Utility functions
   - `visualization.py` - Functions for visualizing 3D poses and metrics
   - `metrics.py` - Functions for computing various dance metrics
 - `examples/` - Example scripts demonstrating system usage
   - `demo.py` - Comprehensive demonstration of features
+  - `hands_4d_demo.py` - Demo for the 4DHands module
+- `configs/` - Configuration files
 
 ## Citation
 
