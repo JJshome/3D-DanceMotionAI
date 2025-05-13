@@ -28,6 +28,21 @@ pose_estimation:
   joint_count: 25
   hand_model_path: "models/4dhands_weights.pth"
 
+# 4DHands Module
+hands_4d:
+  input_dim: 3  # x, y, z coordinates
+  hidden_dim: 128
+  num_fingers: 5  # thumb, index, middle, ring, pinky
+  joints_per_finger: 4  # MCP, PIP, DIP, TIP
+  num_heads: 4  # for transformer attention
+  num_layers: 3  # for transformer layers
+  dropout: 0.1
+  use_lstm_crf: true  # for gesture classification
+  num_classes: 30  # number of hand gesture classes to recognize
+  enforce_bone_length: true  # ensure realistic hand proportions
+  temporal_window: 32  # frames to consider for temporal context
+  use_confidence_weighting: true  # weight keypoints by detection confidence
+
 # Multimodal Analysis (DanceFormer)
 multimodal_analysis:
   model_path: "models/danceformer_weights.pth"
@@ -59,6 +74,15 @@ visualization:
   plot_style: "seaborn-whitegrid"
   3d_renderer: "pyrender"  # Options: "pyrender", "plotly", "matplotlib"
   show_confidence: true
+  hand_joint_size: 20
+  hand_colors:
+    wrist: [0, 0, 0]  # black
+    thumb: [255, 0, 0]  # red
+    index: [0, 0, 255]  # blue
+    middle: [0, 255, 0]  # green
+    ring: [128, 0, 128]  # purple
+    pinky: [255, 165, 0]  # orange
+    palm: [128, 128, 128]  # gray
 
 # AR/VR Settings
 ar_vr:
