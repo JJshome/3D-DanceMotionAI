@@ -15,3 +15,7 @@ pillow>=9.2.0
 pandas>=1.5.0
 tensorboard>=2.10.0
 pytest>=7.0.0
+plotly>=5.10.0
+fastdtw>=0.3.4
+pyrender>=0.1.45
+ffmpeg-python>=0.2.0
