@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - DanceMotionAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
+    <style>
+        body {
+            padding-top: 60px;
+            background-color: #f8f9fa;
+        }
+        .results-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #343a40;
+            border-left: 4px solid #6a11cb;
+            padding-left: 15px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #6a11cb;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .timeline-container {
+            height: 100px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .timeline {
+            height: 30px;
+            background-color: #e9ecef;
+            margin-top: 35px;
+            position: relative;
+        }
+        .timeline-marker {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background-color: #6a11cb;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        .similarity-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .similarity-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #6a11cb;
+        }
+        .similarity-label {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        .similarity-gauge {
+            position: relative;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        .similarity-gauge-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #ff7f50 0%, #ffdc35 50%, #4caf50 100%);
+            border-radius: 3px;
+        }
+        .similarity-gauge-marker {
+            position: absolute;
+            top: -7px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 2px solid #6a11cb;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            margin-top: 30px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .joint-diagram {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            background-image: url('https://via.placeholder.com/500x500?text=Human+Skeleton');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .joint-hotspot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(106, 17, 203, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .joint-hotspot:hover {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(106, 17, 203, 0.8);
+        }
+        .nav-tabs .nav-link.active {
+            color: #6a11cb;
+            border-color: #dee2e6 #dee2e6 #fff;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link:not(.active) {
+            color: #6c757d;
+        }
+        .badge-performance {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .badge-excellent {
+            background-color: #4caf50;
+            color: white;
+        }
+        .badge-good {
+            background-color: #2196f3;
+            color: white;
+        }
+        .badge-average {
+            background-color: #ff9800;
+            color: white;
+        }
+        .badge-needs-improvement {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-camera-reels"></i> DanceMotionAI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/JJshome/3D-DanceMotionAI" target="_blank">GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="results-container">
+            <h1 class="mb-4">Dance Analysis Results
+                <a href="/" class="btn btn-outline-secondary btn-sm float-end">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+            </h1>
+            
+            <!-- Analysis Type Information -->
+            <div class="alert alert-primary" id="analysis-type-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <span id="analysis-type-text">Loading analysis information...</span>
+            </div>
+            
+            <!-- Results Tabs -->
+            <ul class="nav nav-tabs mb-4" id="resultsTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="metrics-tab" data-bs-toggle="tab" href="#metrics">Detailed Metrics</a>
+                </li>
+                <li class="nav-item" id="similarity-tab-container" style="display: none;">
+                    <a class="nav-link" id="similarity-tab" data-bs-toggle="tab" href="#similarity">Similarity Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="visualization-tab" data-bs-toggle="tab" href="#visualization">3D Visualization</a>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="section-title">Visual Analysis</div>
+                            <div class="video-container">
+                                <video id="overview-video" controls>
+                                    <source id="video-source" src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="timeline-container">
+                                <div class="timeline">
+                                    <div class="timeline-marker" id="timeline-marker"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="section-title">Performance Summary</div>
+                            <div id="performance-summary">
+                                <!-- This will be populated by JavaScript -->
+                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-title mt-4">Key Insights</div>
+                            <div id="key-insights">
+                                <!-- This will be populated by JavaScript -->
+                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Overall Score Section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="section-title">Overall Performance Score</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="similarity-container text-center">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="similarity-score" id="overall-score">--</div>
+                                        <div class="similarity-label">Overall Score</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="similarity-gauge">
+                                            <div class="similarity-gauge-fill" id="overall-gauge-fill" style="width: 0%;"></div>
+                                            <div class="similarity-gauge-marker" id="overall-gauge-marker" style="left: 0%;"></div>
+                                        </div>
+                                        <div class="row text-center mt-2">
+                                            <div class="col-4 text-start text-muted small">Needs Improvement</div>
+                                            <div class="col-4 text-center text-muted small">Average</div>
+                                            <div class="col-4 text-end text-muted small">Excellent</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Metrics Tab -->
+                <div class="tab-pane fade" id="metrics">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="section-title">Performance Metrics</div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Movement Precision</h4>
+                                <div class="metric-value"><span id="precision-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Accuracy of dance movements compared to standard techniques</p>
+                                <div class="progress mt-2">
+                                    <div id="precision-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Timing Accuracy</h4>
+                                <div class="metric-value"><span id="timing-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Synchronization with music beats and rhythm</p>
+                                <div class="progress mt-2">
+                                    <div id="timing-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Hand Movement Quality</h4>
+                                <div class="metric-value"><span id="hand-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Precision and expressiveness of hand gestures</p>
+                                <div class="progress mt-2">
+                                    <div id="hand-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Energy Level</h4>
+                                <div class="metric-value"><span id="energy-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Intensity and dynamics of movement execution</p>
+                                <div class="progress mt-2">
+                                    <div id="energy-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Movement Fluidity</h4>
+                                <div class="metric-value"><span id="fluidity-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Smoothness and continuity of movement transitions</p>
+                                <div class="progress mt-2">
+                                    <div id="fluidity-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="metric-card">
+                                <h4>Balance Control</h4>
+                                <div class="metric-value"><span id="balance-value">--</span><span class="fs-6">%</span></div>
+                                <p class="text-muted">Stability and body control during movements</p>
+                                <div class="progress mt-2">
+                                    <div id="balance-progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="section-title">Movement Analysis</div>
+                            <div class="chart-container">
+                                <canvas id="movement-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title">Music-Movement Correlation</div>
+                            <div class="chart-container">
+                                <canvas id="correlation-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="section-title">Joint Performance Analysis</div>
+                            <div class="joint-diagram">
+                                <!-- Joint hotspots will be added by JavaScript -->
+                                <div class="joint-hotspot" style="left: 50%; top: 20%;" data-joint="head"></div>
+                                <div class="joint-hotspot" style="left: 50%; top: 35%;" data-joint="torso"></div>
+                                <div class="joint-hotspot" style="left: 35%; top: 30%;" data-joint="left_shoulder"></div>
+                                <div class="joint-hotspot" style="left: 65%; top: 30%;" data-joint="right_shoulder"></div>
+                                <div class="joint-hotspot" style="left: 25%; top: 40%;" data-joint="left_elbow"></div>
+                                <div class="joint-hotspot" style="left: 75%; top: 40%;" data-joint="right_elbow"></div>
+                                <div class="joint-hotspot" style="left: 20%; top: 50%;" data-joint="left_hand"></div>
+                                <div class="joint-hotspot" style="left: 80%; top: 50%;" data-joint="right_hand"></div>
+                                <div class="joint-hotspot" style="left: 40%; top: 55%;" data-joint="left_hip"></div>
+                                <div class="joint-hotspot" style="left: 60%; top: 55%;" data-joint="right_hip"></div>
+                                <div class="joint-hotspot" style="left: 35%; top: 70%;" data-joint="left_knee"></div>
+                                <div class="joint-hotspot" style="left: 65%; top: 70%;" data-joint="right_knee"></div>
+                                <div class="joint-hotspot" style="left: 30%; top: 85%;" data-joint="left_foot"></div>
+                                <div class="joint-hotspot" style="left: 70%; top: 85%;" data-joint="right_foot"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title">Selected Joint Analysis</div>
+                            <div id="joint-analysis">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Click on a joint in the diagram to see detailed analysis
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Similarity Analysis Tab -->
+                <div class="tab-pane fade" id="similarity">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="section-title">Your Performance</div>
+                            <div class="video-container">
+                                <video id="your-video" controls>
+                                    <source id="your-video-source" src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title">Reference Performance</div>
+                            <div class="video-container">
+                                <video id="reference-video" controls>
+                                    <source id="reference-video-source" src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="section-title">Similarity Score</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="similarity-container text-center">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="similarity-score" id="similarity-score">--</div>
+                                        <div class="similarity-label">Choreography Similarity</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="similarity-gauge">
+                                            <div class="similarity-gauge-fill" id="similarity-gauge-fill" style="width: 0%;"></div>
+                                            <div class="similarity-gauge-marker" id="similarity-gauge-marker" style="left: 0%;"></div>
+                                        </div>
+                                        <div class="row text-center mt-2">
+                                            <div class="col-4 text-start text-muted small">Low Similarity</div>
+                                            <div class="col-4 text-center text-muted small">Moderate</div>
+                                            <div class="col-4 text-end text-muted small">High Similarity</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="section-title">Similarity Heatmap</div>
+                            <div class="chart-container">
+                                <canvas id="similarity-heatmap"></canvas>
+                            </div>
+                            <p class="text-muted small mt-2">The heatmap shows similarity between your performance and the reference at different points in time. Brighter areas indicate higher similarity.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title">Key Differences</div>
+                            <div id="key-differences">
+                                <!-- This will be populated by JavaScript -->
+                                <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visualization Tab -->
+                <div class="tab-pane fade" id="visualization">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="section-title">3D Visualization</div>
+                            <div class="video-container">
+                                <video id="visualization-video" controls>
+                                    <source id="visualization-video-source" src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <p class="text-muted mt-2">
+                                This visualization shows the 3D pose estimation of your dance performance. The skeletal model tracks your movements in three-dimensional space, providing insights into your posture, balance, and movement patterns.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="section-title">Motion Trajectory</div>
+                            <div class="chart-container">
+                                <canvas id="trajectory-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="section-title">Joint Velocities</div>
+                            <div class="chart-container">
+                                <canvas id="velocity-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>DanceMotionAI</h4>
+                    <p>
+                        Advanced 3D dance analysis system based on high-precision pose estimation,
+                        multimodal analysis, and choreography comparison.
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/#features" class="text-white">Features</a></li>
+                        <li><a href="/#upload" class="text-white">Upload</a></li>
+                        <li><a href="https://github.com/JJshome/3D-DanceMotionAI" class="text-white" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:info@dancemotionai.com" class="text-white">info@dancemotionai.com</a></li>
+                        <li><a href="https://github.com/JJshome" class="text-white" target="_blank">GitHub Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 DanceMotionAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskId = '{{ task_id }}';
+            let resultsData = null;
+            
+            // Get video elements
+            const overviewVideo = document.getElementById('overview-video');
+            const yourVideo = document.getElementById('your-video');
+            const referenceVideo = document.getElementById('reference-video');
+            const visualizationVideo = document.getElementById('visualization-video');
+            
+            // Set video sources
+            document.getElementById('video-source').src = `/visualization/${taskId}`;
+            document.getElementById('your-video-source').src = `/visualization/${taskId}`;
+            document.getElementById('visualization-video-source').src = `/visualization/${taskId}`;
+            
+            // Reload videos to apply source changes
+            overviewVideo.load();
+            yourVideo.load();
+            visualizationVideo.load();
+            
+            // Fetch results data
+            fetch(`/results/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsData = data;
+                    console.log('Results data:', resultsData);
+                    
+                    // Update UI based on task type
+                    if (data.task_type === 'compare') {
+                        document.getElementById('similarity-tab-container').style.display = 'block';
+                        document.getElementById('analysis-type-text').textContent = 'Choreography Comparison: Your performance is being compared to a reference dance.';
+                        document.getElementById('reference-video-source').src = `/visualization/${taskId}/reference`;
+                        referenceVideo.load();
+                    } else {
+                        document.getElementById('analysis-type-text').textContent = 'Single Video Analysis: Your dance performance is being analyzed for technique and quality.';
+                    }
+                    
+                    // Update metrics
+                    updateMetrics(data.metrics);
+                    
+                    // Update similarity analysis if available
+                    if (data.similarity) {
+                        updateSimilarityAnalysis(data.similarity);
+                    }
+                    
+                    // Create charts
+                    createCharts(data.metrics);
+                    
+                    // Populate performance summary
+                    updatePerformanceSummary(data.metrics);
+                    
+                    // Populate key insights
+                    updateKeyInsights(data.metrics);
+                    
+                    // Set up joint hotspot interactions
+                    setupJointInteractions(data.metrics);
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    document.getElementById('analysis-type-text').textContent = 'Error loading analysis results. Please try again later.';
+                });
+            
+            // Update metrics UI
+            function updateMetrics(metrics) {
+                if (!metrics) return;
+                
+                // Calculate overall score (average of all metrics)
+                const overallScore = calculateOverallScore(metrics);
+                document.getElementById('overall-score').textContent = overallScore;
+                
+                // Update overall gauge
+                const overallPercentage = overallScore;
+                document.getElementById('overall-gauge-fill').style.width = `${overallPercentage}%`;
+                document.getElementById('overall-gauge-marker').style.left = `${overallPercentage}%`;
+                
+                // Update individual metrics
+                updateMetricValue('precision', metrics.movement_precision || 0);
+                updateMetricValue('timing', metrics.timing_accuracy || 0);
+                updateMetricValue('hand', metrics.hand_movement_quality || 0);
+                updateMetricValue('energy', metrics.energy_level || 0);
+                updateMetricValue('fluidity', metrics.movement_fluidity || 0);
+                updateMetricValue('balance', metrics.balance_control || 0);
+            }
+            
+            function updateMetricValue(id, value) {
+                document.getElementById(`${id}-value`).textContent = Math.round(value);
+                document.getElementById(`${id}-progress`).style.width = `${value}%`;
+                
+                // Set color based on value
+                const progressElement = document.getElementById(`${id}-progress`);
+                if (value >= 80) {
+                    progressElement.className = 'progress-bar bg-success';
+                } else if (value >= 60) {
+                    progressElement.className = 'progress-bar bg-info';
+                } else if (value >= 40) {
+                    progressElement.className = 'progress-bar bg-warning';
+                } else {
+                    progressElement.className = 'progress-bar bg-danger';
+                }
+            }
+            
+            function calculateOverallScore(metrics) {
+                const values = [
+                    metrics.movement_precision || 0,
+                    metrics.timing_accuracy || 0,
+                    metrics.hand_movement_quality || 0,
+                    metrics.energy_level || 0,
+                    metrics.movement_fluidity || 0,
+                    metrics.balance_control || 0
+                ];
+                
+                const sum = values.reduce((a, b) => a + b, 0);
+                return Math.round(sum / values.length);
+            }
+            
+            function updateSimilarityAnalysis(similarity) {
+                if (!similarity) return;
+                
+                // Update similarity score
+                const similarityScore = Math.round(similarity.overall_similarity * 100);
+                document.getElementById('similarity-score').textContent = similarityScore;
+                
+                // Update similarity gauge
+                document.getElementById('similarity-gauge-fill').style.width = `${similarityScore}%`;
+                document.getElementById('similarity-gauge-marker').style.left = `${similarityScore}%`;
+                
+                // Populate key differences
+                const keyDifferencesElement = document.getElementById('key-differences');
+                if (similarity.key_differences && similarity.key_differences.length > 0) {
+                    let differencesHTML = '<ul class="list-group">';
+                    similarity.key_differences.forEach((diff, index) => {
+                        differencesHTML += `
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">Difference ${index + 1}</h5>
+                                    <small>${formatTimestamp(diff.timestamp)}</small>
+                                </div>
+                                <p class="mb-1">${diff.description}</p>
+                                <small class="text-muted">${diff.suggestion || 'No specific suggestion available'}</small>
+                            </li>
+                        `;
+                    });
+                    differencesHTML += '</ul>';
+                    keyDifferencesElement.innerHTML = differencesHTML;
+                } else {
+                    keyDifferencesElement.innerHTML = '<div class="alert alert-info">No significant differences detected.</div>';
+                }
+                
+                // Create similarity heatmap
+                createSimilarityHeatmap(similarity);
+            }
+            
+            function createSimilarityHeatmap(similarity) {
+                if (!similarity || !similarity.frame_similarities) return;
+                
+                const ctx = document.getElementById('similarity-heatmap').getContext('2d');
+                
+                // Prepare data for heatmap
+                const labels = Array.from({length: similarity.frame_similarities.length}, (_, i) => i);
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Frame Similarity',
+                            data: similarity.frame_similarities.map(s => s * 100),
+                            borderColor: '#6a11cb',
+                            backgroundColor: 'rgba(106, 17, 203, 0.1)',
+                            fill: true,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Frame Number'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Similarity (%)'
+                                },
+                                min: 0,
+                                max: 100
+                            }
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    return `Similarity: ${tooltipItem.yLabel.toFixed(1)}%`;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function createCharts(metrics) {
+                if (!metrics) return;
+                
+                // Create movement analysis radar chart
+                const movementCtx = document.getElementById('movement-chart').getContext('2d');
+                new Chart(movementCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: [
+                            'Precision',
+                            'Timing',
+                            'Hand Movement',
+                            'Energy',
+                            'Fluidity',
+                            'Balance'
+                        ],
+                        datasets: [{
+                            label: 'Your Performance',
+                            data: [
+                                metrics.movement_precision || 0,
+                                metrics.timing_accuracy || 0,
+                                metrics.hand_movement_quality || 0,
+                                metrics.energy_level || 0,
+                                metrics.movement_fluidity || 0,
+                                metrics.balance_control || 0
+                            ],
+                            backgroundColor: 'rgba(106, 17, 203, 0.2)',
+                            borderColor: '#6a11cb',
+                            pointBackgroundColor: '#6a11cb',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#6a11cb'
+                        }]
+                    },
+                    options: {
+                        scale: {
+                            ticks: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+                
+                // Create correlation chart (if data available)
+                if (metrics.music_correlation_data) {
+                    const correlationCtx = document.getElementById('correlation-chart').getContext('2d');
+                    new Chart(correlationCtx, {
+                        type: 'line',
+                        data: {
+                            labels: metrics.music_correlation_data.map((_, i) => i),
+                            datasets: [{
+                                label: 'Movement-Music Correlation',
+                                data: metrics.music_correlation_data,
+                                borderColor: '#6a11cb',
+                                backgroundColor: 'rgba(106, 17, 203, 0.1)',
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 1
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Create trajectory chart
+                const trajectoryCtx = document.getElementById('trajectory-chart').getContext('2d');
+                new Chart(trajectoryCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Center of Mass',
+                            data: generateRandomTrajectoryData(100),
+                            backgroundColor: '#6a11cb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'X Position'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Y Position'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Create velocity chart
+                const velocityCtx = document.getElementById('velocity-chart').getContext('2d');
+                new Chart(velocityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 50}, (_, i) => i),
+                        datasets: [
+                            {
+                                label: 'Hands',
+                                data: generateRandomVelocityData(50),
+                                borderColor: '#6a11cb',
+                                backgroundColor: 'transparent'
+                            },
+                            {
+                                label: 'Feet',
+                                data: generateRandomVelocityData(50),
+                                borderColor: '#2196f3',
+                                backgroundColor: 'transparent'
+                            },
+                            {
+                                label: 'Torso',
+                                data: generateRandomVelocityData(50, 0.5),
+                                borderColor: '#4caf50',
+                                backgroundColor: 'transparent'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function updatePerformanceSummary(metrics) {
+                if (!metrics) return;
+                
+                const overallScore = calculateOverallScore(metrics);
+                let performanceLevel = '';
+                let badgeClass = '';
+                
+                if (overallScore >= 80) {
+                    performanceLevel = 'Excellent';
+                    badgeClass = 'badge-excellent';
+                } else if (overallScore >= 65) {
+                    performanceLevel = 'Good';
+                    badgeClass = 'badge-good';
+                } else if (overallScore >= 50) {
+                    performanceLevel = 'Average';
+                    badgeClass = 'badge-average';
+                } else {
+                    performanceLevel = 'Needs Improvement';
+                    badgeClass = 'badge-needs-improvement';
+                }
+                
+                // Find top strengths and areas for improvement
+                const metricsList = [
+                    { name: 'Movement Precision', value: metrics.movement_precision || 0 },
+                    { name: 'Timing Accuracy', value: metrics.timing_accuracy || 0 },
+                    { name: 'Hand Movement Quality', value: metrics.hand_movement_quality || 0 },
+                    { name: 'Energy Level', value: metrics.energy_level || 0 },
+                    { name: 'Movement Fluidity', value: metrics.movement_fluidity || 0 },
+                    { name: 'Balance Control', value: metrics.balance_control || 0 }
+                ];
+                
+                const sortedMetrics = [...metricsList].sort((a, b) => b.value - a.value);
+                const strengths = sortedMetrics.slice(0, 2);
+                const improvements = [...metricsList].sort((a, b) => a.value - b.value).slice(0, 2);
+                
+                const summaryHTML = `
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Overall Performance <span class="badge badge-performance ${badgeClass}">${performanceLevel}</span></h5>
+                            <p class="card-text">
+                                Your dance performance has an overall score of <strong>${overallScore}%</strong>, 
+                                which is considered <strong>${performanceLevel}</strong>.
+                            </p>
+                            
+                            <h6 class="mt-3 mb-2">Top Strengths:</h6>
+                            <ul>
+                                ${strengths.map(m => `<li><strong>${m.name}:</strong> ${Math.round(m.value)}%</li>`).join('')}
+                            </ul>
+                            
+                            <h6 class="mt-3 mb-2">Areas for Improvement:</h6>
+                            <ul>
+                                ${improvements.map(m => `<li><strong>${m.name}:</strong> ${Math.round(m.value)}%</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('performance-summary').innerHTML = summaryHTML;
+            }
+            
+            function updateKeyInsights(metrics) {
+                if (!metrics) return;
+                
+                // Generate insights based on metrics
+                let insights = [];
+                
+                if (metrics.movement_precision < 50) {
+                    insights.push("Your movement precision needs improvement. Focus on learning the correct techniques for each movement.");
+                }
+                
+                if (metrics.timing_accuracy < 60) {
+                    insights.push("Your timing with the music could be improved. Practice with a metronome or count beats out loud.");
+                }
+                
+                if (metrics.hand_movement_quality < 55) {
+                    insights.push("Hand gestures lack precision. Practice isolated hand movements and positions in front of a mirror.");
+                }
+                
+                if (metrics.energy_level < 50) {
+                    insights.push("Your energy level appears low. Focus on increasing intensity and commitment to each movement.");
+                }
+                
+                if (metrics.movement_fluidity < 60) {
+                    insights.push("Transitions between movements could be smoother. Practice linking movements together slowly, then increase speed.");
+                }
+                
+                if (metrics.balance_control < 55) {
+                    insights.push("Balance issues were detected. Core strengthening exercises could help improve stability.");
+                }
+                
+                // If no major issues, provide positive insights
+                if (insights.length === 0) {
+                    insights = [
+                        "Your performance shows good technical execution across all metrics.",
+                        "Your timing with the music is excellent, showing strong musicality.",
+                        "Hand movements are precise and expressive, adding depth to your performance."
+                    ];
+                }
+                
+                // Ensure we have at least 3 insights
+                while (insights.length < 3) {
+                    if (metrics.movement_precision > 70) {
+                        insights.push("Your movement precision is strong, showing good technical foundation.");
+                    }
+                    if (metrics.timing_accuracy > 70 && insights.length < 3) {
+                        insights.push("You demonstrate good musicality and rhythm awareness.");
+                    }
+                    if (metrics.energy_level > 70 && insights.length < 3) {
+                        insights.push("Your performance shows good energy and dynamism.");
+                    }
+                    
+                    // If still not enough, add generic insight
+                    if (insights.length < 3) {
+                        insights.push("Continue practicing consistently to build on your current skills.");
+                    }
+                }
+                
+                // Limit to 3 insights
+                insights = insights.slice(0, 3);
+                
+                const insightsHTML = `
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                ${insights.map(insight => `
+                                    <li class="list-group-item border-0 px-0">
+                                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                                        ${insight}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('key-insights').innerHTML = insightsHTML;
+            }
+            
+            function setupJointInteractions(metrics) {
+                const jointHotspots = document.querySelectorAll('.joint-hotspot');
+                const jointAnalysisElement = document.getElementById('joint-analysis');
+                
+                jointHotspots.forEach(hotspot => {
+                    hotspot.addEventListener('click', () => {
+                        const joint = hotspot.dataset.joint;
+                        
+                        // Generate analysis for the selected joint
+                        let jointScore = 0;
+                        let jointIssues = [];
+                        let jointStrengths = [];
+                        
+                        // Generate mock data (in a real app, this would come from the backend)
+                        switch (joint) {
+                            case 'head':
+                                jointScore = 82;
+                                jointStrengths.push("Good posture and alignment");
+                                break;
+                            case 'torso':
+                                jointScore = 75;
+                                jointStrengths.push("Good core engagement");
+                                jointIssues.push("Slight forward lean in fast movements");
+                                break;
+                            case 'left_shoulder':
+                            case 'right_shoulder':
+                                jointScore = 68;
+                                jointIssues.push("Tension detected during lifts");
+                                jointStrengths.push("Good range of motion");
+                                break;
+                            case 'left_elbow':
+                            case 'right_elbow':
+                                jointScore = 72;
+                                jointStrengths.push("Consistent positioning");
+                                break;
+                            case 'left_hand':
+                            case 'right_hand':
+                                jointScore = metrics.hand_movement_quality || 65;
+                                if (jointScore < 70) {
+                                    jointIssues.push("Lacks precision in finger positions");
+                                    jointIssues.push("Movement appears tense");
+                                } else {
+                                    jointStrengths.push("Good expressiveness");
+                                    jointStrengths.push("Clear positions and transitions");
+                                }
+                                break;
+                            case 'left_hip':
+                            case 'right_hip':
+                                jointScore = 78;
+                                jointStrengths.push("Good alignment");
+                                break;
+                            case 'left_knee':
+                            case 'right_knee':
+                                jointScore = 65;
+                                jointIssues.push("Slight hyperextension detected");
+                                break;
+                            case 'left_foot':
+                            case 'right_foot':
+                                jointScore = 70;
+                                jointIssues.push("Incomplete pointing/flexing");
+                                jointStrengths.push("Good weight distribution");
+                                break;
+                            default:
+                                jointScore = 75;
+                        }
+                        
+                        // Format joint name for display
+                        const jointName = joint.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        
+                        // Determine performance level
+                        let performanceLevel = '';
+                        let badgeClass = '';
+                        
+                        if (jointScore >= 80) {
+                            performanceLevel = 'Excellent';
+                            badgeClass = 'badge-excellent';
+                        } else if (jointScore >= 70) {
+                            performanceLevel = 'Good';
+                            badgeClass = 'badge-good';
+                        } else if (jointScore >= 60) {
+                            performanceLevel = 'Average';
+                            badgeClass = 'badge-average';
+                        } else {
+                            performanceLevel = 'Needs Improvement';
+                            badgeClass = 'badge-needs-improvement';
+                        }
+                        
+                        // Create HTML for joint analysis
+                        let jointHTML = `
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${jointName} <span class="badge badge-performance ${badgeClass}">${performanceLevel}</span></h5>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" role="progressbar" style="width: ${jointScore}%;" aria-valuenow="${jointScore}" aria-valuemin="0" aria-valuemax="100">${jointScore}%</div>
+                                    </div>
+                        `;
+                        
+                        if (jointStrengths.length > 0) {
+                            jointHTML += `
+                                <h6 class="mt-3 mb-2">Strengths:</h6>
+                                <ul>
+                                    ${jointStrengths.map(strength => `<li>${strength}</li>`).join('')}
+                                </ul>
+                            `;
+                        }
+                        
+                        if (jointIssues.length > 0) {
+                            jointHTML += `
+                                <h6 class="mt-3 mb-2">Issues to Address:</h6>
+                                <ul>
+                                    ${jointIssues.map(issue => `<li>${issue}</li>`).join('')}
+                                </ul>
+                            `;
+                        }
+                        
+                        // Add improvement suggestions
+                        jointHTML += `
+                                <h6 class="mt-3 mb-2">Suggestions:</h6>
+                                <p>
+                                    ${getJointSuggestion(joint, jointScore)}
+                                </p>
+                            </div>
+                        </div>
+                        `;
+                        
+                        jointAnalysisElement.innerHTML = jointHTML;
+                    });
+                });
+            }
+            
+            function getJointSuggestion(joint, score) {
+                if (score >= 80) {
+                    return "Continue with current technique. Your performance in this area is excellent.";
+                }
+                
+                const suggestions = {
+                    head: "Focus on keeping your head aligned with your spine. Practice with a mirror to check head position.",
+                    torso: "Work on core strength exercises to improve stability. Practice engaging your core while dancing.",
+                    left_shoulder: "Practice shoulder relaxation exercises. Avoid unnecessary tension during arm movements.",
+                    right_shoulder: "Practice shoulder relaxation exercises. Avoid unnecessary tension during arm movements.",
+                    left_elbow: "Focus on fluid elbow movement. Practice isolated arm exercises to improve control.",
+                    right_elbow: "Focus on fluid elbow movement. Practice isolated arm exercises to improve control.",
+                    left_hand: "Practice precise hand positions in front of a mirror. Work on finger articulation.",
+                    right_hand: "Practice precise hand positions in front of a mirror. Work on finger articulation.",
+                    left_hip: "Work on hip flexibility and isolation exercises. Practice hip alignment in basic positions.",
+                    right_hip: "Work on hip flexibility and isolation exercises. Practice hip alignment in basic positions.",
+                    left_knee: "Focus on proper knee alignment and avoiding hyperextension. Strengthening exercises recommended.",
+                    right_knee: "Focus on proper knee alignment and avoiding hyperextension. Strengthening exercises recommended.",
+                    left_foot: "Practice foot articulation exercises. Work on full extension and flexion of the foot.",
+                    right_foot: "Practice foot articulation exercises. Work on full extension and flexion of the foot."
+                };
+                
+                return suggestions[joint] || "Focus on technique and awareness of this body part during practice.";
+            }
+            
+            // Helper functions
+            function formatTimestamp(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            function generateRandomTrajectoryData(points) {
+                const data = [];
+                let x = 0;
+                let y = 0;
+                
+                for (let i = 0; i < points; i++) {
+                    x += (Math.random() - 0.5) * 0.3;
+                    y += (Math.random() - 0.5) * 0.3;
+                    data.push({x, y});
+                }
+                
+                return data;
+            }
+            
+            function generateRandomVelocityData(points, scale = 1) {
+                return Array.from({length: points}, () => Math.random() * 5 * scale + 1);
+            }
+            
+            // Timeline control
+            const timeline = document.querySelector('.timeline');
+            const timelineMarker = document.getElementById('timeline-marker');
+            
+            timeline.addEventListener('click', function(e) {
+                const rect = timeline.getBoundingClientRect();
+                const position = (e.clientX - rect.left) / rect.width;
+                
+                // Update marker position
+                timelineMarker.style.left = `${position * 100}%`;
+                
+                // Update video time
+                const videoDuration = overviewVideo.duration;
+                if (videoDuration) {
+                    overviewVideo.currentTime = videoDuration * position;
+                }
+            });
+            
+            // Update timeline marker as video plays
+            overviewVideo.addEventListener('timeupdate', function() {
+                const position = overviewVideo.currentTime / overviewVideo.duration;
+                timelineMarker.style.left = `${position * 100}%`;
+            });
+            
+            // Synchronize videos in similarity tab
+            yourVideo.addEventListener('play', () => {
+                referenceVideo.currentTime = yourVideo.currentTime;
+                referenceVideo.play();
+            });
+            
+            yourVideo.addEventListener('pause', () => {
+                referenceVideo.pause();
+            });
+            
+            yourVideo.addEventListener('seeked', () => {
+                referenceVideo.currentTime = yourVideo.currentTime;
+            });
+            
+            referenceVideo.addEventListener('play', () => {
+                yourVideo.currentTime = referenceVideo.currentTime;
+                yourVideo.play();
+            });
+            
+            referenceVideo.addEventListener('pause', () => {
+                yourVideo.pause();
+            });
+            
+            referenceVideo.addEventListener('seeked', () => {
+                yourVideo.currentTime = referenceVideo.currentTime;
+            });
+        });
+    </script>
+</body>
+</html>
