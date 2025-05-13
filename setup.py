@@ -20,17 +20,37 @@ setup(
     ],
     python_requires=">=3.7",
     install_requires=[
-        "numpy>=1.19.0",
-        "matplotlib>=3.3.0",
-        "scipy>=1.5.0",
+        "numpy>=1.22.0",
+        "matplotlib>=3.5.0",
+        "scipy>=1.8.0",
+        "torch>=1.13.0",
+        "torchvision>=0.14.0",
+        "opencv-python>=4.6.0",
         "fastdtw>=0.3.4",
-        "plotly>=5.0.0"
+        "plotly>=5.0.0",
+        "pyyaml>=6.0",
+        "tqdm>=4.64.0",
+        "scikit-learn>=1.1.0",
+        "PyWavelets>=1.3.0"
     ],
     extras_require={
         "dev": [
             "pytest>=6.0.0",
             "black>=21.5b2",
             "flake8>=3.9.2",
+        ],
+        "web": [
+            "flask>=2.2.0",
+            "werkzeug>=2.2.0",
+            "requests>=2.28.0"
+        ],
+        "ml": [
+            "tensorboard>=2.10.0"
+        ]
+    },
+    entry_points={
+        'console_scripts': [
+            'dance-motion-ai=dancemotionai.cli:main',
         ],
     },
 )
