@@ -1,0 +1,78 @@
+---
+# 3D-DanceMotionAI Configuration
+
+# General Settings
+general:
+  debug: false
+  save_intermediate_results: false
+  use_gpu: true
+  random_seed: 42
+  output_dir: "results"
+
+# Data Settings
+data:
+  video_fps: 30
+  image_size: [1080, 1920]  # [height, width]
+  max_people: 5
+  min_person_size: 100  # Minimum pixel height for valid detection
+
+# 3D Pose Estimation (DanceHRNet)
+pose_estimation:
+  model_path: "models/dancehrnet_weights.pth"
+  confidence_threshold: 0.6
+  feature_dim: 512
+  agt_blocks: 6
+  attention_heads: 8
+  gcn_layers: 3
+  use_kitro: true
+  joint_count: 25
+  hand_model_path: "models/4dhands_weights.pth"
+
+# Multimodal Analysis (DanceFormer)
+multimodal_analysis:
+  model_path: "models/danceformer_weights.pth"
+  fusion_type: "cross_attention"  # Options: "concat", "cross_attention", "sum"
+  music_feature_dim: 128
+  sequence_length: 120  # 4 seconds at 30fps
+  transformer_layers: 4
+  use_dynamic_graph: true
+
+# Similarity Analysis (3D-DanceDTW)
+similarity_analysis:
+  feature_extractor:
+    joint_angle_weight: 0.4
+    velocity_weight: 0.3
+    acceleration_weight: 0.2
+    position_weight: 0.1
+  
+  wavelet: "db4"
+  wavelet_levels: 3
+  scale_weights: [0.6, 0.3, 0.1]
+  use_learned_weights: true
+  weight_model_path: "models/weight_model.pth"
+  similarity_threshold: 0.7  # Threshold for determining similarity
+
+# Visualization
+visualization:
+  skeleton_color: [0, 255, 0]  # RGB
+  skeleton_thickness: 2
+  plot_style: "seaborn-whitegrid"
+  3d_renderer: "pyrender"  # Options: "pyrender", "plotly", "matplotlib"
+  show_confidence: true
+
+# AR/VR Settings
+ar_vr:
+  enable_ar: false
+  enable_vr: false
+  ar_device: "hololens"  # Options: "hololens", "arkit", "arcore"
+  vr_device: "oculus"  # Options: "oculus", "vive", "wmr"
+  haptic_feedback: false
+
+# Web Interface
+web_interface:
+  host: "0.0.0.0"
+  port: 8080
+  max_upload_size: 500  # MB
+  allowed_extensions: ["mp4", "avi", "mov", "mp3", "wav"]
+  enable_https: false
+  session_timeout: 3600  # seconds
