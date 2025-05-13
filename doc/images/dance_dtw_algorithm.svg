@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Definitions for gradients and patterns -->
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EF6C00" />
+      <stop offset="100%" stop-color="#FFA726" />
+    </linearGradient>
+    <linearGradient id="matrixGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3E0" />
+      <stop offset="100%" stop-color="#FFE0B2" />
+    </linearGradient>
+    <linearGradient id="featureGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FB8C00" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#EF6C00" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="waveletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7E57C2" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#512DA8" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="dtwGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00ACC1" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#00838F" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <!-- Arrow marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#546E7A"/>
+    </marker>
+    <!-- Path animation -->
+    <path id="dtwPath" d="M10,90 L30,50 L50,40 L70,30 L90,10" stroke="#00ACC1" stroke-width="2" fill="none"/>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#F5F5F5"/>
+  
+  <!-- Header -->
+  <rect x="50" y="30" width="700" height="60" rx="5" fill="url(#headerGradient)" filter="url(#shadow)"/>
+  <text x="400" y="70" font-family="Roboto, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">3D-DanceDTW Algorithm</text>
+  
+  <!-- Input Sequences -->
+  <g transform="translate(50, 120)">
+    <rect width="700" height="90" rx="5" fill="#FFF8E1" stroke="#FFECB3" stroke-width="2"/>
+    <text x="350" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Input 3D Pose Sequences</text>
+    
+    <!-- Reference Sequence -->
+    <g transform="translate(50, 45)">
+      <rect width="250" height="30" rx="3" fill="url(#featureGradient)" filter="url(#shadow)"/>
+      <text x="125" y="20" font-family="Roboto, sans-serif" font-size="14" text-anchor="middle" fill="white">Reference Sequence (T₁ frames)</text>
+    </g>
+    
+    <!-- Comparison Sequence -->
+    <g transform="translate(400, 45)">
+      <rect width="250" height="30" rx="3" fill="url(#featureGradient)" filter="url(#shadow)"/>
+      <text x="125" y="20" font-family="Roboto, sans-serif" font-size="14" text-anchor="middle" fill="white">Comparison Sequence (T₂ frames)</text>
+    </g>
+  </g>
+  
+  <!-- Feature Extraction -->
+  <g transform="translate(50, 230)">
+    <rect width="700" height="120" rx="5" fill="#E0F7FA" stroke="#B2EBF2" stroke-width="2"/>
+    <text x="350" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">3D Pose Feature Extraction</text>
+    
+    <!-- Joint Angles -->
+    <g transform="translate(50, 45)">
+      <rect width="150" height="60" rx="3" fill="url(#featureGradient)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Roboto, sans-serif" font-size="14" text-anchor="middle" fill="white">Joint Angles</text>
+      <text x="75" y="45" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">3D Rotation between</text>
+      <text x="75" y="60" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">adjacent body segments</text>
+    </g>
+    
+    <!-- Velocities -->
+    <g transform="translate(230, 45)">
+      <rect width="150" height="60" rx="3" fill="url(#featureGradient)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Roboto, sans-serif" font-size="14" text-anchor="middle" fill="white">Velocities</text>
+      <text x="75" y="45" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">Rate of change in</text>
+      <text x="75" y="60" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">position over time</text>
+    </g>
+    
+    <!-- Accelerations -->
+    <g transform="translate(410, 45)">
+      <rect width="150" height="60" rx="3" fill="url(#featureGradient)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Roboto, sans-serif" font-size="14" text-anchor="middle" fill="white">Accelerations</text>
+      <text x="75" y="45" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">Rate of change in</text>
+      <text x="75" y="60" font-family="Roboto, sans-serif" font-size="10" text-anchor="middle" fill="white">velocity over time</text>
+    </g>
+    
+    <!-- Feature animation -->
+    <rect x="50" y="45" width="150" height="60" rx="3" stroke="#FFA000" stroke-width="2" fill="none" stroke-dasharray="5,3">
+      <animate attributeName="stroke-opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
+    </rect>
+    <rect x="230" y="45" width="150" height="60" rx="3" stroke="#FFA000" stroke-width="2" fill="none" stroke-dasharray="5,3">
+      <animate attributeName="stroke-opacity" values="1;0.3;1" dur="3s" begin="0.5s" repeatCount="indefinite" />
+    </rect>
+    <rect x="410" y="45" width="150" height="60" rx="3" stroke="#FFA000" stroke-width="2" fill="none" stroke-dasharray="5,3">
+      <animate attributeName="stroke-opacity" values="1;0.3;1" dur="3s" begin="1s" repeatCount="indefinite" />
+    </rect>
+  </g>
+  
+  <!-- Wavelet Transform -->
+  <g transform="translate(50, 370)">
+    <rect width="700" height="80" rx="5" fill="#EDE7F6" stroke="#D1C4E9" stroke-width="2"/>
+    <text x="350" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Multi-Scale Wavelet Transform</text>
+    
+    <!-- Wavelet Scales -->
+    <g transform="translate(120, 45)">
+      <rect width="120" height="25" rx="3" fill="url(#waveletGradient)" filter="url(#shadow)"/>
+      <text x="60" y="17" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle" fill="white">Scale 1 (Original)</text>
+    </g>
+    
+    <g transform="translate(290, 45)">
+      <rect width="120" height="25" rx="3" fill="url(#waveletGradient)" filter="url(#shadow)"/>
+      <text x="60" y="17" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle" fill="white">Scale 2 (Coarser)</text>
+    </g>
+    
+    <g transform="translate(460, 45)">
+      <rect width="120" height="25" rx="3" fill="url(#waveletGradient)" filter="url(#shadow)"/>
+      <text x="60" y="17" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle" fill="white">Scale 3 (Coarsest)</text>
+    </g>
+  </g>
+  
+  <!-- DTW Distance Calculation -->
+  <g transform="translate(50, 470)">
+    <rect width="700" height="100" rx="5" fill="#E0F2F1" stroke="#B2DFDB" stroke-width="2"/>
+    <text x="350" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Dynamic Time Warping</text>
+    
+    <!-- Distance Matrix -->
+    <g transform="translate(50, 40)">
+      <rect width="200" height="50" rx="3" fill="url(#matrixGradient)" filter="url(#shadow)"/>
+      <text x="100" y="30" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle">Distance Matrix Calculation</text>
+      <rect width="200" height="50" rx="3" stroke="#00ACC1" stroke-width="2" fill="none" stroke-dasharray="5,3">
+        <animate attributeName="stroke-opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
+      </rect>
+    </g>
+    
+    <!-- Optimal Path -->
+    <g transform="translate(270, 40)">
+      <rect width="200" height="50" rx="3" fill="url(#dtwGradient)" filter="url(#shadow)"/>
+      <text x="100" y="30" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle" fill="white">Optimal Warping Path Search</text>
+    </g>
+    
+    <!-- Similarity Score -->
+    <g transform="translate(490, 40)">
+      <rect width="160" height="50" rx="3" fill="url(#dtwGradient)" filter="url(#shadow)"/>
+      <text x="80" y="30" font-family="Roboto, sans-serif" font-size="12" text-anchor="middle" fill="white">Similarity Score</text>
+    </g>
+  </g>
+  
+  <!-- Connecting Arrows -->
+  <line x1="400" y1="210" x2="400" y2="230" stroke="#546E7A" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="350" x2="400" y2="370" stroke="#546E7A" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="450" x2="400" y2="470" stroke="#546E7A" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Animations for dynamic effect -->
+  <g transform="translate(280, 505)">
+    <path d="M10,10 L30,5 L50,15 L70,5 L90,0" stroke="#00ACC1" stroke-width="2" fill="none">
+      <animate attributeName="stroke-dasharray" values="0,500;500,0" dur="5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>
