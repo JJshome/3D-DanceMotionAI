@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DanceMotionAI - 3D Dance Choreography Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 60px;
+            background-color: #f8f9fa;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 80px 0;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #6a11cb;
+        }
+        .upload-area {
+            background-color: white;
+            border: 2px dashed #ced4da;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #6a11cb;
+        }
+        .upload-icon {
+            font-size: 3rem;
+            color: #6a11cb;
+            margin-bottom: 20px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #6a11cb;
+        }
+        #reference-upload-container {
+            display: none;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+        #progress-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-camera-reels"></i> DanceMotionAI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/JJshome/3D-DanceMotionAI" target="_blank">GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <!-- Hero Section -->
+        <div class="hero-section text-center">
+            <h1 class="display-4 fw-bold mb-4">3D Dance Choreography Analysis</h1>
+            <p class="lead mb-4">
+                Advanced AI-powered dance movement analysis with high-precision 3D pose estimation,
+                choreography comparison, and detailed feedback.
+            </p>
+            <a href="#upload" class="btn btn-light btn-lg">Get Started</a>
+        </div>
+
+        <!-- Features Section -->
+        <section id="features" class="mb-5">
+            <h2 class="text-center mb-5">Key Features</h2>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-person-bounding-box"></i>
+                        </div>
+                        <h3>3D Pose Estimation</h3>
+                        <p>
+                            High-precision 3D pose tracking using our proprietary DanceHRNet with
+                            adaptive graph transformer network technology.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-hand-index-thumb"></i>
+                        </div>
+                        <h3>Hand Movement Analysis</h3>
+                        <p>
+                            Detailed hand gesture tracking using our 4DHands module for
+                            comprehensive analysis of even the smallest movements.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-music-note-beamed"></i>
+                        </div>
+                        <h3>Music-Movement Correlation</h3>
+                        <p>
+                            Advanced analysis of how dance movements synchronize with music using
+                            our DanceFormer multimodal analysis system.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-clipboard-data"></i>
+                        </div>
+                        <h3>Choreography Comparison</h3>
+                        <p>
+                            Compare dance performances to reference videos with our 3D-DanceDTW
+                            algorithm for accurate similarity analysis.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Performance Metrics</h3>
+                        <p>
+                            Comprehensive statistics on movement quality, timing accuracy,
+                            synchronization, and more for detailed evaluation.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card bg-white">
+                        <div class="feature-icon">
+                            <i class="bi bi-camera-video"></i>
+                        </div>
+                        <h3>3D Visualization</h3>
+                        <p>
+                            Interactive 3D visualizations allowing multi-angle viewing and
+                            frame-by-frame analysis of dance movements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section id="upload" class="mb-5">
+            <h2 class="text-center mb-5">Analyze Your Dance Video</h2>
+            
+            <!-- Mode Selection -->
+            <ul class="nav nav-pills mb-4 justify-content-center" id="uploadTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="single-tab" data-bs-toggle="pill" href="#single-upload">Single Video Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="compare-tab" data-bs-toggle="pill" href="#compare-upload">Compare Choreographies</a>
+                </li>
+            </ul>
+            
+            <div class="tab-content">
+                <!-- Single Video Upload -->
+                <div class="tab-pane fade show active" id="single-upload">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <h3>Upload Your Dance Video</h3>
+                        <p class="text-muted">Click to browse or drag and drop your video file here</p>
+                        <p class="small text-muted">Supported formats: MP4, AVI, MOV, MKV, WebM (Max 500MB)</p>
+                        <input type="file" id="file-upload" class="d-none" accept=".mp4,.avi,.mov,.mkv,.webm">
+                    </div>
+                </div>
+                
+                <!-- Compare Videos Upload -->
+                <div class="tab-pane fade" id="compare-upload">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="upload-area" id="main-upload-area">
+                                <div class="upload-icon">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                </div>
+                                <h3>Upload Your Dance Video</h3>
+                                <p class="text-muted">Click to browse or drag and drop your video</p>
+                                <input type="file" id="main-file-upload" class="d-none" accept=".mp4,.avi,.mov,.mkv,.webm">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="upload-area" id="reference-upload-area">
+                                <div class="upload-icon">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                </div>
+                                <h3>Upload Reference Video</h3>
+                                <p class="text-muted">Click to browse or drag and drop reference video</p>
+                                <input type="file" id="reference-file-upload" class="d-none" accept=".mp4,.avi,.mov,.mkv,.webm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Container -->
+            <div id="progress-container" class="mt-4">
+                <h4 id="upload-status">Uploading...</h4>
+                <div class="progress mb-3">
+                    <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                </div>
+                <div id="upload-message" class="small text-muted"></div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="text-center mt-4">
+                <button id="submit-button" class="btn btn-primary btn-lg" disabled>
+                    <i class="bi bi-lightning-charge"></i> Start Analysis
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>DanceMotionAI</h4>
+                    <p>
+                        Advanced 3D dance analysis system based on high-precision pose estimation,
+                        multimodal analysis, and choreography comparison.
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#features" class="text-white">Features</a></li>
+                        <li><a href="#upload" class="text-white">Upload</a></li>
+                        <li><a href="https://github.com/JJshome/3D-DanceMotionAI" class="text-white" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="mailto:info@dancemotionai.com" class="text-white">info@dancemotionai.com</a></li>
+                        <li><a href="https://github.com/JJshome" class="text-white" target="_blank">GitHub Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 DanceMotionAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables
+            const uploadArea = document.getElementById('upload-area');
+            const fileUpload = document.getElementById('file-upload');
+            const mainUploadArea = document.getElementById('main-upload-area');
+            const mainFileUpload = document.getElementById('main-file-upload');
+            const referenceUploadArea = document.getElementById('reference-upload-area');
+            const referenceFileUpload = document.getElementById('reference-file-upload');
+            const submitButton = document.getElementById('submit-button');
+            const progressContainer = document.getElementById('progress-container');
+            const uploadProgressBar = document.getElementById('upload-progress-bar');
+            const uploadStatus = document.getElementById('upload-status');
+            const uploadMessage = document.getElementById('upload-message');
+            
+            let mainFile = null;
+            let referenceFile = null;
+            let taskType = 'analyze';
+            
+            // Event listeners for upload areas
+            uploadArea.addEventListener('click', () => fileUpload.click());
+            mainUploadArea.addEventListener('click', () => mainFileUpload.click());
+            referenceUploadArea.addEventListener('click', () => referenceFileUpload.click());
+            
+            // Event listeners for file inputs
+            fileUpload.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    mainFile = e.target.files[0];
+                    uploadArea.innerHTML = `<div class="upload-icon"><i class="bi bi-check-circle"></i></div>
+                                           <h3>${mainFile.name}</h3>
+                                           <p class="text-muted">${formatFileSize(mainFile.size)}</p>`;
+                    updateSubmitButton();
+                }
+            });
+            
+            mainFileUpload.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    mainFile = e.target.files[0];
+                    mainUploadArea.innerHTML = `<div class="upload-icon"><i class="bi bi-check-circle"></i></div>
+                                               <h3>${mainFile.name}</h3>
+                                               <p class="text-muted">${formatFileSize(mainFile.size)}</p>`;
+                    updateSubmitButton();
+                }
+            });
+            
+            referenceFileUpload.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    referenceFile = e.target.files[0];
+                    referenceUploadArea.innerHTML = `<div class="upload-icon"><i class="bi bi-check-circle"></i></div>
+                                                    <h3>${referenceFile.name}</h3>
+                                                    <p class="text-muted">${formatFileSize(referenceFile.size)}</p>`;
+                    updateSubmitButton();
+                }
+            });
+            
+            // Upload tabs event listener
+            document.querySelectorAll('#uploadTabs a').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', (e) => {
+                    if (e.target.id === 'single-tab') {
+                        taskType = 'analyze';
+                    } else if (e.target.id === 'compare-tab') {
+                        taskType = 'compare';
+                    }
+                    updateSubmitButton();
+                });
+            });
+            
+            // Submit button event listener
+            submitButton.addEventListener('click', () => {
+                submitButton.disabled = true;
+                progressContainer.style.display = 'block';
+                uploadStatus.textContent = 'Uploading...';
+                uploadProgressBar.style.width = '0%';
+                uploadMessage.textContent = 'Preparing files for upload';
+                
+                const formData = new FormData();
+                formData.append('task_type', taskType);
+                
+                if (taskType === 'analyze') {
+                    formData.append('file', mainFile);
+                } else if (taskType === 'compare') {
+                    formData.append('file', mainFile);
+                    formData.append('reference_file', referenceFile);
+                }
+                
+                // Simulate upload progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    if (progress > 90) clearInterval(progressInterval);
+                    uploadProgressBar.style.width = `${progress}%`;
+                }, 300);
+                
+                // Send the request
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    clearInterval(progressInterval);
+                    uploadProgressBar.style.width = '100%';
+                    
+                    if (data.error) {
+                        uploadStatus.textContent = 'Error';
+                        uploadMessage.textContent = data.error;
+                        return;
+                    }
+                    
+                    uploadStatus.textContent = 'Upload Complete';
+                    uploadMessage.textContent = data.message;
+                    
+                    // Redirect to results page after a short delay
+                    setTimeout(() => {
+                        window.location.href = `/view/${data.task_id}`;
+                    }, 1500);
+                })
+                .catch(error => {
+                    clearInterval(progressInterval);
+                    uploadStatus.textContent = 'Error';
+                    uploadMessage.textContent = 'There was a problem with the upload: ' + error.message;
+                    submitButton.disabled = false;
+                });
+            });
+            
+            // Helper functions
+            function updateSubmitButton() {
+                if (taskType === 'analyze') {
+                    submitButton.disabled = !mainFile;
+                } else if (taskType === 'compare') {
+                    submitButton.disabled = !(mainFile && referenceFile);
+                }
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                mainUploadArea.addEventListener(eventName, preventDefaults, false);
+                referenceUploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+                mainUploadArea.addEventListener(eventName, highlight, false);
+                referenceUploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+                mainUploadArea.addEventListener(eventName, unhighlight, false);
+                referenceUploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight(e) {
+                e.currentTarget.classList.add('border-primary');
+            }
+            
+            function unhighlight(e) {
+                e.currentTarget.classList.remove('border-primary');
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            mainUploadArea.addEventListener('drop', handleMainDrop, false);
+            referenceUploadArea.addEventListener('drop', handleReferenceDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) {
+                    fileUpload.files = files;
+                    const event = new Event('change');
+                    fileUpload.dispatchEvent(event);
+                }
+            }
+            
+            function handleMainDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) {
+                    mainFileUpload.files = files;
+                    const event = new Event('change');
+                    mainFileUpload.dispatchEvent(event);
+                }
+            }
+            
+            function handleReferenceDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) {
+                    referenceFileUpload.files = files;
+                    const event = new Event('change');
+                    referenceFileUpload.dispatchEvent(event);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
