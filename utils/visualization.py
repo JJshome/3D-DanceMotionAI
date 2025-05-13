@@ -666,3 +666,161 @@ def export_3d_model(pose: np.ndarray, output_path: str) -> None:
             f.write(f"f {face[0]} {face[1]} {face[2]}\n")
     
     print(f"3D model saved to {output_path}")
+
+
+def visualize_hand_keypoints(hand_data: np.ndarray, 
+                             connections: List[Tuple[int, int]],
+                             ax: Optional[plt.Axes] = None,
+                             title: Optional[str] = None,
+                             color_map: Optional[Dict[str, str]] = None,
+                             joint_size: int = 30) -> plt.Axes:
+    """
+    Visualize hand keypoints in 3D.
+    
+    Args:
+        hand_data: Hand keypoint data with shape [num_keypoints, 3]
+        connections: List of tuples representing connections between keypoints
+        ax: Optional matplotlib 3D axis to plot on
+        title: Optional title for the plot
+        color_map: Optional dictionary mapping finger names to colors
+        joint_size: Size of the joint markers
+        
+    Returns:
+        The matplotlib Axes object
+    """
+    if ax is None:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+    
+    # Default color map if none provided
+    if color_map is None:
+        color_map = {
+            'wrist': 'black',
+            'thumb': 'red',
+            'index': 'blue',
+            'middle': 'green',
+            'ring': 'purple',
+            'pinky': 'orange',
+            'palm': 'gray'
+        }
+    
+    # Extract coordinates
+    x = hand_data[:, 0]
+    y = hand_data[:, 1]
+    z = hand_data[:, 2]
+    
+    # Define keypoint groups for fingers
+    finger_groups = {
+        'wrist': [0],
+        'thumb': [1, 2, 3, 4],
+        'index': [5, 6, 7, 8],
+        'middle': [9, 10, 11, 12],
+        'ring': [13, 14, 15, 16],
+        'pinky': [17, 18, 19, 20]
+    }
+    
+    # Plot keypoints by finger group
+    for finger_name, indices in finger_groups.items():
+        valid_indices = [i for i in indices if i < len(hand_data)]
+        if valid_indices:
+            ax.scatter(
+                x[valid_indices], y[valid_indices], z[valid_indices],
+                color=color_map[finger_name],
+                s=joint_size,
+                label=finger_name
+            )
+    
+    # Plot connections
+    for connection in connections:
+        if max(connection) < len(hand_data):
+            i, j = connection
+            
+            # Determine the color based on the finger
+            line_color = 'gray'  # Default color
+            
+            # Check which finger group the connection belongs to
+            for finger_name, indices in finger_groups.items():
+                if i in indices and j in indices:
+                    line_color = color_map[finger_name]
+                    break
+            
+            # If it's a palm connection, use the palm color
+            if (i == 0 or j == 0) or ((i in finger_groups['index'] and j in finger_groups['middle']) or
+                                      (i in finger_groups['middle'] and j in finger_groups['ring']) or
+                                      (i in finger_groups['ring'] and j in finger_groups['pinky'])):
+                line_color = color_map.get('palm', 'gray')
+            
+            ax.plot([x[i], x[j]], [y[i], y[j]], [z[i], z[j]], 
+                    color=line_color, linewidth=2)
+    
+    # Set labels and title
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    
+    if title:
+        ax.set_title(title)
+    
+    # Set equal aspect ratio
+    max_range = np.max([np.max(x) - np.min(x), 
+                        np.max(y) - np.min(y), 
+                        np.max(z) - np.min(z)])
+    mid_x = (np.max(x) + np.min(x)) * 0.5
+    mid_y = (np.max(y) + np.min(y)) * 0.5
+    mid_z = (np.max(z) + np.min(z)) * 0.5
+    ax.set_xlim(mid_x - max_range * 0.5, mid_x + max_range * 0.5)
+    ax.set_ylim(mid_y - max_range * 0.5, mid_y + max_range * 0.5)
+    ax.set_zlim(mid_z - max_range * 0.5, mid_z + max_range * 0.5)
+    
+    # Add legend if not already present
+    if not ax.get_legend():
+        ax.legend(loc='best')
+    
+    return ax
+
+
+def visualize_hands_sequence(hands_sequence: np.ndarray,
+                            connections: List[Tuple[int, int]],
+                            interval: int = 50,
+                            save_path: Optional[str] = None,
+                            view_angles: Optional[Tuple[float, float]] = None) -> None:
+    """
+    Create an animation of a hand pose sequence.
+    
+    Args:
+        hands_sequence: Hand pose sequence data with shape [num_frames, num_hands, num_keypoints, 3]
+        connections: List of tuples representing connections between keypoints
+        interval: Time interval between frames in milliseconds
+        save_path: Optional path to save the animation as a video file (.mp4)
+        view_angles: Tuple of (elevation, azimuth) viewing angles
+    """
+    fig = plt.figure(figsize=(12, 6))
+    
+    # Create subplots for each hand
+    num_hands = hands_sequence.shape[1]
+    axes = []
+    
+    for i in range(num_hands):
+        ax = fig.add_subplot(1, num_hands, i+1, projection='3d')
+        axes.append(ax)
+    
+    def update(frame):
+        """Update function for animation"""
+        for i, ax in enumerate(axes):
+            ax.clear()
+            if i < num_hands:
+                hand_data = hands_sequence[frame, i]
+                title = f"Hand {i+1} - Frame {frame}/{len(hands_sequence)-1}"
+                visualize_hand_keypoints(hand_data, connections, ax=ax, title=title)
+                if view_angles:
+                    ax.view_init(elev=view_angles[0], azim=view_angles[1])
+        return []
+    
+    anim = FuncAnimation(fig, update, frames=len(hands_sequence), 
+                         interval=interval, blit=False)
+    
+    if save_path:
+        anim.save(save_path, writer='ffmpeg', fps=1000/interval)
+    
+    plt.tight_layout()
+    plt.show()
