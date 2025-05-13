@@ -15,6 +15,46 @@ DanceMotionAI is an advanced AI-powered dance movement analysis system with high
 - **Performance Metrics**: Comprehensive statistics on movement quality, timing accuracy, synchronization, and more
 - **3D Visualization**: Interactive 3D visualizations of dance movements for detailed analysis
 
+## System Architecture
+
+![System Overview](doc/images/system_overview.svg)
+
+Our system consists of four main components:
+
+### DanceHRNet (3D Pose Estimation)
+![DanceHRNet Architecture](doc/images/dancehrnet_architecture.svg)
+
+Our 3D pose estimation model combines graph convolutional networks with transformer architecture to achieve high precision in pose tracking. Key innovations include:
+
+- **Adaptive Graph Transformer (AGT) Blocks**: Combine the global context modeling of transformers with the local structural reasoning of graph neural networks
+- **Global-Local Adaptive Graph Convolutional Network (GLA-GCN)**: Specialized for handling occlusions and complex movements
+- **Keypoint Information-based Rotation Optimization (KITRO)**: Improves depth estimation accuracy
+
+### DanceFormer (Multimodal Analysis)
+![DanceFormer Architecture](doc/images/danceformer_architecture.svg)
+
+Our multimodal analysis system correlates dance movements with music features using:
+
+- **Cross-modal Attention Mechanism**: Aligns specific music elements (beats, melody) with dance movements
+- **Multi-scale Transformer**: Analyzes movement patterns at different time scales (frame, phrase, sequence)
+- **Dynamic Graph Generation**: Captures dancer interactions and temporal relationships
+
+### 3D-DanceDTW (Choreography Comparison)
+![Dance DTW Algorithm](doc/images/dance_dtw_algorithm.svg)
+
+The choreography comparison module uses an enhanced Dynamic Time Warping algorithm specifically designed for 3D dance movement data:
+
+- **3D Pose-based Distance Metric**: Considers joint positions, velocities, accelerations, and angles
+- **Multi-scale DTW**: Analyzes similarity at different temporal scales using wavelet transform
+- **Style-adaptive Weighting**: Adapts comparison metrics based on dance style
+
+### 4DHands Module
+
+The hand movement analysis module provides detailed tracking of hand gestures with:
+
+- **Relation-aware Two-Hand Tokenization (RAT)**: Models relationships between finger joints
+- **Spatio-temporal Interaction Reasoning (SIR)**: Analyzes how both hands interact over time
+
 ## Project Structure
 
 ```
@@ -142,39 +182,6 @@ You can customize the behavior of DanceMotionAI by modifying the configuration f
 - `similarity_analysis.similarity_threshold`: Threshold for similarity detection
 - `visualization.*`: Various visualization settings
 
-## System Components
-
-### DanceHRNet
-
-Our 3D pose estimation model combines graph convolutional networks with transformer architecture to achieve high precision in pose tracking. Key innovations include:
-
-- **Adaptive Graph Transformer (AGT) Blocks**: Combine the global context modeling of transformers with the local structural reasoning of graph neural networks
-- **Global-Local Adaptive Graph Convolutional Network (GLA-GCN)**: Specialized for handling occlusions and complex movements
-- **Keypoint Information-based Rotation Optimization (KITRO)**: Improves depth estimation accuracy
-
-### 4DHands
-
-The hand movement analysis module provides detailed tracking of hand gestures with:
-
-- **Relation-aware Two-Hand Tokenization (RAT)**: Models relationships between finger joints
-- **Spatio-temporal Interaction Reasoning (SIR)**: Analyzes how both hands interact over time
-
-### DanceFormer
-
-Our multimodal analysis system correlates dance movements with music features using:
-
-- **Cross-modal Attention Mechanism**: Aligns specific music elements (beats, melody) with dance movements
-- **Multi-scale Transformer**: Analyzes movement patterns at different time scales (frame, phrase, sequence)
-- **Dynamic Graph Generation**: Captures dancer interactions and temporal relationships
-
-### 3D-DanceDTW
-
-The choreography comparison module uses an enhanced Dynamic Time Warping algorithm specifically designed for 3D dance movement data:
-
-- **3D Pose-based Distance Metric**: Considers joint positions, velocities, accelerations, and angles
-- **Multi-scale DTW**: Analyzes similarity at different temporal scales using wavelet transform
-- **Style-adaptive Weighting**: Adapts comparison metrics based on dance style
-
 ## Applications
 
 DanceMotionAI can be used in various scenarios including:
@@ -185,42 +192,5 @@ DanceMotionAI can be used in various scenarios including:
 - **Copyright Protection**: Identify choreography similarities for intellectual property protection
 - **Virtual Reality**: Create realistic avatar movements for VR dance applications
 
-## Contributing
-
-We welcome contributions to improve DanceMotionAI! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Citation
-
-If you use DanceMotionAI in your research, please cite our paper:
-
-```
-@article{jang2025dancemotionai,
-  title={DanceMotionAI: High-Precision 3D Pose Estimation-based AI Dance Choreography Analysis and Evaluation System},
-  author={Jang, Jiwhan and Kim, Hoyeon},
-  journal={Proceedings of the International Conference on Computer Vision},
-  year={2025}
-}
-```
-
-## Contact
-
-- Jiwhan Jang - jjshome@example.com
-- Project Link: [https://github.com/JJshome/3D-DanceMotionAI](https://github.com/JJshome/3D-DanceMotionAI)
-
-## Acknowledgements
-
-- [PyTorch](https://pytorch.org/)
-- [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-- [HRNet](https://github.com/HRNet/HRNet-Human-Pose-Estimation)
-- [MediaPipe](https://mediapipe.dev/)
-- [Librosa](https://librosa.org/)
+This project is licensed under the MIT License and some integration has been filed as a patent.
