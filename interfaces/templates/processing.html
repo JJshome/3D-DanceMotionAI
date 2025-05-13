@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing - DanceMotionAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 60px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+        }
+        .processing-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+        .processing-icon {
+            font-size: 4rem;
+            color: #6a11cb;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 20px;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            transition: width 0.5s ease;
+        }
+        .step-container {
+            border-left: 2px solid #dee2e6;
+            padding-left: 20px;
+            margin-left: 10px;
+            margin-top: 30px;
+        }
+        .step {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .step::before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #dee2e6;
+            left: -28px;
+            top: 3px;
+        }
+        .step.completed::before {
+            background-color: #28a745;
+        }
+        .step.active::before {
+            background-color: #6a11cb;
+        }
+        .step-title {
+            font-weight: 500;
+        }
+        .step-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-camera-reels"></i> DanceMotionAI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/JJshome/3D-DanceMotionAI" target="_blank">GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content container">
+        <div class="processing-container text-center">
+            <div class="processing-icon">
+                <i id="status-icon" class="bi bi-arrow-clockwise"></i>
+            </div>
+            <h2 id="status-title">Processing Your Video</h2>
+            <p id="status-message" class="text-muted mb-4">
+                Please wait while we analyze your dance video. This may take several minutes depending on the length of your video.
+            </p>
+            
+            <div class="progress mb-3">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-muted small mb-4">0% complete</p>
+            
+            <div class="step-container text-start">
+                <div class="step" id="step-1">
+                    <div class="step-title">Video Processing</div>
+                    <div class="step-description">Loading and preprocessing video frames</div>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-title">3D Pose Estimation</div>
+                    <div class="step-description">Extracting 3D poses using DanceHRNet</div>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-title">Hand Movement Analysis</div>
+                    <div class="step-description">Analyzing detailed hand movements with 4DHands</div>
+                </div>
+                <div class="step" id="step-4">
+                    <div class="step-title">Music Analysis</div>
+                    <div class="step-description">Extracting musical features and beats</div>
+                </div>
+                <div class="step" id="step-5">
+                    <div class="step-title">Dance-Music Correlation</div>
+                    <div class="step-description">Analyzing synchronization between dance and music</div>
+                </div>
+                <div class="step" id="step-6">
+                    <div class="step-title">Performance Metrics</div>
+                    <div class="step-description">Computing dance performance metrics</div>
+                </div>
+                <div class="step" id="step-7">
+                    <div class="step-title">Visualization Creation</div>
+                    <div class="step-description">Creating 3D visualizations of dance movements</div>
+                </div>
+            </div>
+            
+            <div id="error-container" class="alert alert-danger mt-4" style="display: none;">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span id="error-message">An error occurred during processing</span>
+            </div>
+            
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+                <a id="results-link" href="#" class="btn btn-primary" style="display: none;">
+                    <i class="bi bi-graph-up"></i> View Results
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 DanceMotionAI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskId = '{{ task_id }}';
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const statusIcon = document.getElementById('status-icon');
+            const statusTitle = document.getElementById('status-title');
+            const statusMessage = document.getElementById('status-message');
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+            const resultsLink = document.getElementById('results-link');
+            
+            // Set steps based on progress
+            function updateSteps(progress) {
+                // Clear all active/completed classes first
+                for (let i = 1; i <= 7; i++) {
+                    document.getElementById(`step-${i}`).className = 'step';
+                }
+                
+                // Set completed and active steps
+                if (progress >= 5) document.getElementById('step-1').classList.add('completed');
+                if (progress >= 15) document.getElementById('step-2').classList.add('completed');
+                if (progress >= 30) document.getElementById('step-3').classList.add('completed');
+                if (progress >= 40) document.getElementById('step-4').classList.add('completed');
+                if (progress >= 60) document.getElementById('step-5').classList.add('completed');
+                if (progress >= 80) document.getElementById('step-6').classList.add('completed');
+                if (progress >= 95) document.getElementById('step-7').classList.add('completed');
+                
+                // Set active step
+                if (progress < 5) document.getElementById('step-1').classList.add('active');
+                else if (progress < 15) document.getElementById('step-2').classList.add('active');
+                else if (progress < 30) document.getElementById('step-3').classList.add('active');
+                else if (progress < 40) document.getElementById('step-4').classList.add('active');
+                else if (progress < 60) document.getElementById('step-5').classList.add('active');
+                else if (progress < 80) document.getElementById('step-6').classList.add('active');
+                else if (progress < 95) document.getElementById('step-7').classList.add('active');
+            }
+            
+            // Poll status every 3 seconds
+            function pollStatus() {
+                fetch(`/status/${taskId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update progress bar
+                        const progress = data.progress || 0;
+                        progressBar.style.width = `${progress}%`;
+                        progressText.textContent = `${progress}% complete`;
+                        
+                        // Update status message
+                        if (data.message) {
+                            statusMessage.textContent = data.message;
+                        }
+                        
+                        // Update steps
+                        updateSteps(progress);
+                        
+                        // Check status
+                        if (data.status === 'complete') {
+                            // Processing complete
+                            statusIcon.className = 'bi bi-check-circle';
+                            statusTitle.textContent = 'Processing Complete';
+                            progressBar.classList.remove('progress-bar-animated');
+                            resultsLink.href = `/view/${taskId}`;
+                            resultsLink.style.display = 'inline-block';
+                            return;
+                        } else if (data.status === 'error') {
+                            // Processing error
+                            statusIcon.className = 'bi bi-x-circle';
+                            statusTitle.textContent = 'Processing Error';
+                            statusIcon.style.color = '#dc3545';
+                            progressBar.classList.remove('progress-bar-animated');
+                            progressBar.classList.add('bg-danger');
+                            errorMessage.textContent = data.message || 'An error occurred during processing';
+                            errorContainer.style.display = 'block';
+                            return;
+                        }
+                        
+                        // Continue polling
+                        setTimeout(pollStatus, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Error polling status:', error);
+                        // Continue polling despite errors
+                        setTimeout(pollStatus, 3000);
+                    });
+            }
+            
+            // Initialize status check
+            pollStatus();
+            
+            // Initialize rotation animation for status icon
+            function rotateIcon() {
+                if (statusIcon.className.includes('arrow-clockwise')) {
+                    statusIcon.style.transform = `rotate(${Date.now() / 10 % 360}deg)`;
+                    requestAnimationFrame(rotateIcon);
+                }
+            }
+            rotateIcon();
+        });
+    </script>
+</body>
+</html>
